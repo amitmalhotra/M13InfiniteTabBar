@@ -163,7 +163,7 @@
         CGFloat width = self.frame.size.width / _items.count;
         CGFloat origin = 0;
         for (M13InfiniteTabBarItem *item in _visibleIcons) {
-            item.frame = CGRectMake(origin, 0, width, item.frame.size.height);
+            item.frame = CGRectMake(origin, 20, width, item.frame.size.height);
             origin += width;
             [_tabContainerView addSubview:item];
         }
@@ -328,7 +328,7 @@
     }
 }
 
-- (void)selectItemAtIndex:(NSUInteger)index
+- (void)selectItemAtIndex:(NSInteger)index
 {
     if (index >= _items.count) {
         //Whoops, item doesn't exist.

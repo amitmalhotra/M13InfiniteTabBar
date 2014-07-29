@@ -133,7 +133,7 @@
         numberOfItemsForScrolling = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) ? 6 : 15;
         
         //Set up the selection
-        _selectedIndex = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) ? 2 : 5;
+        _selectedIndex = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) ? 0 : 0;
         //No Scrolling, select first item.
         if (_viewControllers.count < numberOfItemsForScrolling) {
             _selectedIndex = 0;
