@@ -162,7 +162,9 @@
         
         //Create mask for tab bar
         _maskView = [[UIView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height - 60.0, self.view.frame.size.width, 80.0)];
-        
+        if(_disableVerticalMode){
+            _maskView.autoresizingMask=UIViewAutoresizingFlexibleWidth;
+        }
         //Apply iOS 7 style border
         borderLayer = [CAShapeLayer layer];
         borderLayer.lineWidth = 1.0;
@@ -193,6 +195,13 @@
         _selectedViewController.view.frame = CGRectMake(0, 0, _contentView.frame.size.width, _contentView.frame.size.height);
         _selectedViewController.view.contentScaleFactor = [UIScreen mainScreen].scale;
         [_contentView addSubview:_selectedViewController.view];
+        
+        // make child view controllers
+        if(_disableVerticalMode){
+            for (UIViewController* vc in _viewControllers) {
+                                [self addChildViewController:vc];
+            }
+        }
         
         //Update mask
         [self handleInterfaceChange:nil];
@@ -233,7 +242,11 @@
 }
 
 //Handle rotating all view controllers
-- (void)handleInterfaceChange:(NSNotification *)notification
+- (void)handleInterfaceChange:(NSNotification *)notification{
+    [self handleInterfaceChange:notification withAnimation:YES];
+}
+
+- (void)handleInterfaceChange:(NSNotification *)notification withAnimation:(BOOL)animate
 {
     //If notification is nil, we manually called for a redraw
     if (_selectedViewController.shouldAutorotate || notification == nil) {
@@ -249,27 +262,31 @@
         CGFloat angle = 0.0;
         UIInterfaceOrientation interfaceOrientation = UIInterfaceOrientationPortrait;
         BOOL go = FALSE;
-        if (((mask == UIInterfaceOrientationMaskPortrait || mask == UIInterfaceOrientationMaskAllButUpsideDown || mask == UIInterfaceOrientationMaskAll) && orientation == UIDeviceOrientationPortrait)) {
-            go = TRUE;
-        } else if (((mask == UIInterfaceOrientationMaskLandscape || mask == UIInterfaceOrientationMaskLandscapeLeft || mask == UIInterfaceOrientationMaskAllButUpsideDown || mask == UIInterfaceOrientationMaskAll) && orientation == UIDeviceOrientationLandscapeLeft)) {
-            go = TRUE;
-            angle = M_PI_2;
-            interfaceOrientation = UIInterfaceOrientationLandscapeRight;
-        } else if (((mask == UIInterfaceOrientationMaskPortraitUpsideDown ||  mask == UIInterfaceOrientationMaskAllButUpsideDown || mask == UIInterfaceOrientationMaskAll) && orientation == UIDeviceOrientationPortraitUpsideDown)) {
-            go = TRUE;
-            angle = M_PI;
-            interfaceOrientation = UIInterfaceOrientationPortraitUpsideDown;
-        } else if (((mask == UIInterfaceOrientationMaskLandscape || mask == UIInterfaceOrientationMaskLandscapeRight ||  mask == UIInterfaceOrientationMaskAllButUpsideDown || mask == UIInterfaceOrientationMaskAll) && orientation == UIDeviceOrientationLandscapeRight)) {
-            go = TRUE;
-            angle = -M_PI_2;
-            interfaceOrientation = UIInterfaceOrientationLandscapeLeft;
-        }
         
+            if (((mask == UIInterfaceOrientationMaskPortrait || mask == UIInterfaceOrientationMaskAllButUpsideDown || mask == UIInterfaceOrientationMaskAll) && orientation == UIDeviceOrientationPortrait)) {
+                go = TRUE;
+            } else if (((mask == UIInterfaceOrientationMaskLandscape || mask == UIInterfaceOrientationMaskLandscapeLeft || mask == UIInterfaceOrientationMaskAllButUpsideDown || mask == UIInterfaceOrientationMaskAll) && orientation == UIDeviceOrientationLandscapeLeft)) {
+                go = TRUE;
+                angle = M_PI_2;
+                interfaceOrientation = UIInterfaceOrientationLandscapeRight;
+            } else if (((mask == UIInterfaceOrientationMaskPortraitUpsideDown ||  mask == UIInterfaceOrientationMaskAllButUpsideDown || mask == UIInterfaceOrientationMaskAll) && orientation == UIDeviceOrientationPortraitUpsideDown)) {
+                go = TRUE;
+                angle = M_PI;
+                interfaceOrientation = UIInterfaceOrientationPortraitUpsideDown;
+            } else if (((mask == UIInterfaceOrientationMaskLandscape || mask == UIInterfaceOrientationMaskLandscapeRight ||  mask == UIInterfaceOrientationMaskAllButUpsideDown || mask == UIInterfaceOrientationMaskAll) && orientation == UIDeviceOrientationLandscapeRight)) {
+                go = TRUE;
+                angle = -M_PI_2;
+                interfaceOrientation = UIInterfaceOrientationLandscapeLeft;
+            }
+        if (_disableVerticalMode) {
+            angle = 0.0;
+        }
         //Update frames
         if (go) {
             //Start Animation
+            CGFloat animationDuration = (animate)?0.5:0.0;
             [UIView beginAnimations:@"HandleInterfaceChange" context:nil];
-            [UIView setAnimationDuration:0.5];
+            [UIView setAnimationDuration:animationDuration];
             [UIView setAnimationDelegate:self];
             
             CGSize totalSize = [UIScreen mainScreen].bounds.size;
@@ -278,93 +295,135 @@
             //Rotate Status Bar
             [[UIApplication sharedApplication] setStatusBarOrientation:interfaceOrientation];
             //Rotate tab bar items
-            [_infiniteTabBar rotateItemsToOrientation:orientation];
+            [_infiniteTabBar rotateItemsToOrientation:orientation disableVerticalMode:_disableVerticalMode];
             
             //Global values
             CGRect tempFrame;
             
-            if (interfaceOrientation == UIInterfaceOrientationPortrait) {
-                //Code that needs to be separate based on top or bottom
-                if (_tabBarPosition == M13InfiniteTabBarPositionBottom) {
+            if(_disableVerticalMode){
+                //No matter what orientation, pivot the bar to the bottom like a true tab bar
+                if (interfaceOrientation == UIInterfaceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown){
                     tempFrame = CGRectMake(0, 0, totalSize.width, totalSize.height - 50.0);
                     _maskView.frame = CGRectMake(0, totalSize.height - 50.0 - triangleDepth, _maskView.frame.size.width, _maskView.frame.size.height);
-                } else {
-                    tempFrame = CGRectMake(0, 65, totalSize.width, totalSize.height - 65.0);
-                    _maskView.frame = CGRectMake(0, 5, _maskView.frame.size.width, _maskView.frame.size.height);
+                    
+                    _contentView.frame = tempFrame;
+                    _selectedViewController.view.frame = CGRectMake(0, 0, tempFrame.size.width, tempFrame.size.height);
+                    _infiniteTabBar.frame = CGRectMake(0, 0, tempFrame.size.width, _infiniteTabBar.frame.size.height);
+                    
+                    //Rotate the child view controller if it supports the orientation
+//                    if (_selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAll || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAllButUpsideDown || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskPortrait ||
+//                        _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskPortraitUpsideDown) {
+//                        //Rotate View Bounds
+//                        _selectedViewController.view.transform = CGAffineTransformMakeRotation(angle);
+//                        _selectedViewController.view.bounds = CGRectMake(0, 0, tempFrame.size.width, tempFrame.size.height);
+//                    }
+
+                    
                 }
-                
-                _contentView.frame = tempFrame;
-                _selectedViewController.view.frame = CGRectMake(0, 0, tempFrame.size.width, tempFrame.size.height);
-                _infiniteTabBar.frame = CGRectMake(0, 0, _infiniteTabBar.frame.size.width, _infiniteTabBar.frame.size.height);
-                
-                //Rotate the child view controller if it supports the orientation
-                if (_selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAll || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAllButUpsideDown || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskPortrait) {
-                    //Rotate View Bounds
-                    _selectedViewController.view.transform = CGAffineTransformMakeRotation(angle);
-                    _selectedViewController.view.bounds = CGRectMake(0, 0, tempFrame.size.width, tempFrame.size.height);
+                else if (interfaceOrientation == UIInterfaceOrientationLandscapeLeft || interfaceOrientation == UIInterfaceOrientationLandscapeRight){
+                    tempFrame = CGRectMake(0, 0, totalSize.height, totalSize.width - 50.0);
+                    _maskView.frame = CGRectMake(0, totalSize.width - 50.0 - triangleDepth, _maskView.frame.size.width, _maskView.frame.size.height);
+                    
+                    _contentView.frame = tempFrame;
+                    _selectedViewController.view.frame = CGRectMake(0, 0, tempFrame.size.width, tempFrame.size.height);
+                    _infiniteTabBar.frame = CGRectMake(0, 0, tempFrame.size.width, _infiniteTabBar.frame.size.height);
+                    
+                    //Rotate the child view controller if it supports the orientation
+                    if (_selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAll || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAllButUpsideDown || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskLandscape || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskLandscapeRight ||
+                        _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskLandscapeLeft) {
+                        //Rotate View Bounds
+                        _selectedViewController.view.transform = CGAffineTransformMakeRotation(angle);
+                        _selectedViewController.view.bounds = CGRectMake(0, 0, tempFrame.size.width, tempFrame.size.height);
+                        
+                    }
+                    
                 }
-                
-            } else if (interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) {
-                if (_tabBarPosition == M13InfiniteTabBarPositionBottom) {
-                    tempFrame = CGRectMake(0, 0, totalSize.width, totalSize.height - 70.0);
-                    _maskView.frame = CGRectMake(0, totalSize.height - 70.0 - triangleDepth, _maskView.frame.size.width, _maskView.frame.size.height);
-                } else {
-                    tempFrame = CGRectMake(0, 50, totalSize.width, totalSize.height - 50.0);
-                    _maskView.frame = CGRectMake(0, -10, _maskView.frame.size.width, _maskView.frame.size.height);
+            }else{
+                if (interfaceOrientation == UIInterfaceOrientationPortrait) {
+                    //Code that needs to be separate based on top or bottom
+                    if (_tabBarPosition == M13InfiniteTabBarPositionBottom) {
+                        tempFrame = CGRectMake(0, 0, totalSize.width, totalSize.height - 50.0);
+                        _maskView.frame = CGRectMake(0, totalSize.height - 50.0 - triangleDepth, _maskView.frame.size.width, _maskView.frame.size.height);
+                    } else {
+                        tempFrame = CGRectMake(0, 65, totalSize.width, totalSize.height - 65.0);
+                        _maskView.frame = CGRectMake(0, 5, _maskView.frame.size.width, _maskView.frame.size.height);
+                    }
+                    
+                    _contentView.frame = tempFrame;
+                    _selectedViewController.view.frame = CGRectMake(0, 0, tempFrame.size.width, tempFrame.size.height);
+                    _infiniteTabBar.frame = CGRectMake(0, 0, _infiniteTabBar.frame.size.width, _infiniteTabBar.frame.size.height);
+                    
+                    //Rotate the child view controller if it supports the orientation
+                    if (_selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAll || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAllButUpsideDown || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskPortrait) {
+                        //Rotate View Bounds
+                        _selectedViewController.view.transform = CGAffineTransformMakeRotation(angle);
+                        _selectedViewController.view.bounds = CGRectMake(0, 0, tempFrame.size.width, tempFrame.size.height);
+                    }
+                    
                 }
-                
-                _contentView.frame = tempFrame;
-                _selectedViewController.view.frame = CGRectMake(0, 0, tempFrame.size.width, tempFrame.size.height);
-                _infiniteTabBar.frame = CGRectMake(0, 0, _infiniteTabBar.frame.size.width, _infiniteTabBar.frame.size.height);
-                
-                //If the child view controller supports this interface orientation.
-                if (_selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAll || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskPortraitUpsideDown) {
-                    //Rotate View Bounds
-                    _selectedViewController.view.transform = CGAffineTransformMakeRotation(angle);
-                    _selectedViewController.view.bounds = CGRectMake(0, 0, tempFrame.size.width, tempFrame.size.height);
+                else if (interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) {
+                    if (_tabBarPosition == M13InfiniteTabBarPositionBottom) {
+                        tempFrame = CGRectMake(0, 0, totalSize.width, totalSize.height - 70.0);
+                        _maskView.frame = CGRectMake(0, totalSize.height - 70.0 - triangleDepth, _maskView.frame.size.width, _maskView.frame.size.height);
+                    } else {
+                        tempFrame = CGRectMake(0, 50, totalSize.width, totalSize.height - 50.0);
+                        _maskView.frame = CGRectMake(0, -10, _maskView.frame.size.width, _maskView.frame.size.height);
+                    }
+                    
+                    _contentView.frame = tempFrame;
+                    _selectedViewController.view.frame = CGRectMake(0, 0, tempFrame.size.width, tempFrame.size.height);
+                    _infiniteTabBar.frame = CGRectMake(0, 0, _infiniteTabBar.frame.size.width, _infiniteTabBar.frame.size.height);
+                    
+                    //If the child view controller supports this interface orientation.
+                    if (_selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAll || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskPortraitUpsideDown) {
+                        //Rotate View Bounds
+                        _selectedViewController.view.transform = CGAffineTransformMakeRotation(angle);
+                        _selectedViewController.view.bounds = CGRectMake(0, 0, tempFrame.size.width, tempFrame.size.height);
+                    }
+                    
                 }
-                
-            } else if (interfaceOrientation == UIInterfaceOrientationLandscapeLeft) {
-                if (_tabBarPosition == M13InfiniteTabBarPositionBottom) {
-                    tempFrame = CGRectMake(0, 0, totalSize.width, totalSize.height - 50.0);
-                    _maskView.frame = CGRectMake(0, totalSize.height - 50.0 - triangleDepth, _maskView.frame.size.width, _maskView.frame.size.height);
-                } else {
-                    tempFrame = CGRectMake(0, 50.0, totalSize.width, totalSize.height - 50.0);
-                    _maskView.frame = CGRectMake(0, -10, _maskView.frame.size.width, _maskView.frame.size.height);
+                else if (interfaceOrientation == UIInterfaceOrientationLandscapeLeft) {
+                    if (_tabBarPosition == M13InfiniteTabBarPositionBottom) {
+                        tempFrame = CGRectMake(0, 0, totalSize.width, totalSize.height - 50.0);
+                        _maskView.frame = CGRectMake(0, totalSize.height - 50.0 - triangleDepth, _maskView.frame.size.width, _maskView.frame.size.height);
+                    } else {
+                        tempFrame = CGRectMake(0, 50.0, totalSize.width, totalSize.height - 50.0);
+                        _maskView.frame = CGRectMake(0, -10, _maskView.frame.size.width, _maskView.frame.size.height);
+                    }
+                    
+                    _contentView.frame = tempFrame;
+                    _selectedViewController.view.frame = CGRectMake(0, 0, tempFrame.size.width, tempFrame.size.height);
+                    _infiniteTabBar.frame = CGRectMake(0, 0, _infiniteTabBar.frame.size.width, _infiniteTabBar.frame.size.height);
+                    
+                    //If the child view controller supports this interface orientation
+                    if (_selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAll || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAllButUpsideDown || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskLandscape || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskLandscapeRight) {
+                        //Rotate View Bounds
+                        _selectedViewController.view.transform = CGAffineTransformMakeRotation(angle);
+                        _selectedViewController.view.bounds = CGRectMake(0, 0, tempFrame.size.height, tempFrame.size.width);
+                    }
+                    
                 }
-                
-                _contentView.frame = tempFrame;
-                _selectedViewController.view.frame = CGRectMake(0, 0, tempFrame.size.width, tempFrame.size.height);
-                _infiniteTabBar.frame = CGRectMake(0, 0, _infiniteTabBar.frame.size.width, _infiniteTabBar.frame.size.height);
-                
-                //If the child view controller supports this interface orientation
-                if (_selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAll || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAllButUpsideDown || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskLandscape || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskLandscapeRight) {
-                    //Rotate View Bounds
-                    _selectedViewController.view.transform = CGAffineTransformMakeRotation(angle);
-                    _selectedViewController.view.bounds = CGRectMake(0, 0, tempFrame.size.height, tempFrame.size.width);
-                }
-                
-            } else if (interfaceOrientation == UIInterfaceOrientationLandscapeRight) {
-                if (_tabBarPosition == M13InfiniteTabBarPositionBottom) {
-                    tempFrame = CGRectMake(0, 0, totalSize.width , totalSize.height - 50.0);
-                    _maskView.frame = CGRectMake(0, totalSize.height - 50.0 - triangleDepth, _maskView.frame.size.width, _maskView.frame.size.height);
-                } else {
-                    tempFrame = CGRectMake(0, 50, totalSize.width , totalSize.height - 50.0);
-                    _maskView.frame = CGRectMake(0, -10, _maskView.frame.size.width, _maskView.frame.size.height);
-                }
-                
-                _contentView.frame = tempFrame;
-                _infiniteTabBar.frame = CGRectMake(0, 0, _infiniteTabBar.frame.size.width, _infiniteTabBar.frame.size.height);
-                _selectedViewController.view.frame = CGRectMake(0, 0, tempFrame.size.width, tempFrame.size.height);
-                
-                //If the child view controller supports this interface orientation
-                if (_selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAll || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAllButUpsideDown || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskLandscape || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskLandscapeLeft) {
-                    //Rotate View Bounds
-                    _selectedViewController.view.transform = CGAffineTransformMakeRotation(angle);
-                    _selectedViewController.view.bounds = CGRectMake(0, 0, tempFrame.size.height, tempFrame.size.width);
+                else if (interfaceOrientation == UIInterfaceOrientationLandscapeRight) {
+                    if (_tabBarPosition == M13InfiniteTabBarPositionBottom) {
+                        tempFrame = CGRectMake(0, 0, totalSize.width , totalSize.height - 50.0);
+                        _maskView.frame = CGRectMake(0, totalSize.height - 50.0 - triangleDepth, _maskView.frame.size.width, _maskView.frame.size.height);
+                    } else {
+                        tempFrame = CGRectMake(0, 50, totalSize.width , totalSize.height - 50.0);
+                        _maskView.frame = CGRectMake(0, -10, _maskView.frame.size.width, _maskView.frame.size.height);
+                    }
+                    
+                    _contentView.frame = tempFrame;
+                    _infiniteTabBar.frame = CGRectMake(0, 0, _infiniteTabBar.frame.size.width, _infiniteTabBar.frame.size.height);
+                    _selectedViewController.view.frame = CGRectMake(0, 0, tempFrame.size.width, tempFrame.size.height);
+                    
+                    //If the child view controller supports this interface orientation
+                    if (_selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAll || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAllButUpsideDown || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskLandscape || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskLandscapeLeft) {
+                        //Rotate View Bounds
+                        _selectedViewController.view.transform = CGAffineTransformMakeRotation(angle);
+                        _selectedViewController.view.bounds = CGRectMake(0, 0, tempFrame.size.height, tempFrame.size.width);
+                    }
                 }
             }
-            
             //Create the mask for the content view
             CAShapeLayer *maskLayer = [[CAShapeLayer alloc] init];
             CGMutablePathRef path = CGPathCreateMutable();
@@ -452,6 +511,9 @@
         //Redo animation based off of what tabs are on screen.
         [self resetRequiresAttentionBackgroundView];
     }
+    
+    //Update mask
+    [self handleInterfaceChange:nil withAnimation:NO];
 }
 
 - (void)infiniteTabBar:(M13InfiniteTabBar *)tabBar willAnimateInViewControllerForItem:(M13InfiniteTabBarItem *)item

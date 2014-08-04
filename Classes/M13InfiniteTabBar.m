@@ -41,6 +41,7 @@
         _tabContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 10, self.contentSize.width, self.contentSize.height)];
         _tabContainerView.backgroundColor = [UIColor clearColor];
         _tabContainerView.userInteractionEnabled = NO;
+        _tabContainerView.autoresizingMask=UIViewAutoresizingFlexibleWidth;
         [self addSubview:_tabContainerView];
         
         //hide horizontal indicator so the recentering trick is not revealed
@@ -170,19 +171,32 @@
     }
 }
 
-//Handle icon rotation on device rotation
-- (void)rotateItemsToOrientation:(UIDeviceOrientation)orientation;
-{
+- (void)rotateItemsToOrientation:(UIDeviceOrientation)orientation disableVerticalMode:(BOOL)disableVerticalMode{
+    
     CGFloat angle = 0;
-    if ( orientation == UIDeviceOrientationLandscapeRight ) angle = -M_PI_2;
-    else if ( orientation == UIDeviceOrientationLandscapeLeft ) angle = M_PI_2;
-    else if ( orientation == UIDeviceOrientationPortraitUpsideDown ) angle = M_PI;
+    if(disableVerticalMode){
+        angle = 0;
+    }else{
+        
+        if ( orientation == UIDeviceOrientationLandscapeRight ) angle = -M_PI_2;
+        else if ( orientation == UIDeviceOrientationLandscapeLeft ) angle = M_PI_2;
+        else if ( orientation == UIDeviceOrientationPortraitUpsideDown ) angle = M_PI;
+
+    }
+    
     for (M13InfiniteTabBarItem *item in _visibleIcons) {
         [item rotateToAngle:angle];
     }
     for (M13InfiniteTabBarItem *item in _items) {
         [item rotateToAngle:angle];
     }
+}
+
+//Handle icon rotation on device rotation
+- (void)rotateItemsToOrientation:(UIDeviceOrientation)orientation;
+{
+    [self rotateItemsToOrientation:orientation disableVerticalMode:NO];
+
 }
 
 //Set wether or not we should scroll.
@@ -319,7 +333,7 @@
 - (void)singleTapGestureCaptured:(UITapGestureRecognizer *)gesture
 {
     //Calculate the location in _tabBarContainer Coordinates
-    CGPoint location = [gesture locationInView:nil];
+    CGPoint location = [gesture locationInView:_tabContainerView];
     location.x += (self.contentOffset.x - _tabContainerView.frame.origin.x);
     
     M13InfiniteTabBarItem *item = (M13InfiniteTabBarItem *)[self itemAtLocation:location];

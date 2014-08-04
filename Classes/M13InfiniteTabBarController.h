@@ -74,6 +74,8 @@ typedef enum {
 @property (nonatomic, assign) BOOL enableInfiniteScrolling;
 /**The location that the tab bar is pinned. The bar can be pinned to the top or bottom. Default is the bottom.*/
 @property (nonatomic, assign) M13InfiniteTabBarPosition tabBarPosition;
+/** If set to YES, the infinite tab bar stays on the bottom. If set to no, the tab bar will stick to the side with the home button.*/
+@property (nonatomic, assign) BOOL disableVerticalMode;
 
 /** @name Selection Handling */
 /** The selected `UIViewController` instance. */
