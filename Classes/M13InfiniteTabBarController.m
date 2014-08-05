@@ -199,7 +199,7 @@
         // make child view controllers
         if(_disableVerticalMode){
             for (UIViewController* vc in _viewControllers) {
-                                [self addChildViewController:vc];
+                [self addChildViewController:vc];
             }
         }
         
@@ -252,9 +252,26 @@
     if (_selectedViewController.shouldAutorotate || notification == nil) {
         UIDeviceOrientation orientation = [UIDevice currentDevice].orientation;
         
-        //If face down, face up, or unknow, force portrait, otherwise no triangle will be drawn
+        //If face down, face up, or unknow, make it same as the status bar orientation, otherwise no triangle will be drawn
         if (!UIDeviceOrientationIsPortrait(orientation) && !UIDeviceOrientationIsLandscape(orientation)) {
-            orientation = UIDeviceOrientationPortrait;
+            UIInterfaceOrientation uiOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+            switch (uiOrientation) {
+                case UIInterfaceOrientationLandscapeLeft:
+                    orientation=UIDeviceOrientationLandscapeLeft;
+                    break;
+                case UIInterfaceOrientationLandscapeRight:
+                    orientation=UIDeviceOrientationLandscapeRight;
+                    break;
+                case UIInterfaceOrientationPortrait:
+                    orientation=UIDeviceOrientationPortrait;
+                    break;
+                case UIInterfaceOrientationPortraitUpsideDown:
+                    orientation=UIDeviceOrientationPortraitUpsideDown;
+                    break;
+                default:
+                    orientation=UIDeviceOrientationPortrait;
+                    break;
+            }
         }
         
         //check to see if we should rotate, and set proper rotation values for animation
@@ -263,21 +280,21 @@
         UIInterfaceOrientation interfaceOrientation = UIInterfaceOrientationPortrait;
         BOOL go = FALSE;
         
-            if (((mask == UIInterfaceOrientationMaskPortrait || mask == UIInterfaceOrientationMaskAllButUpsideDown || mask == UIInterfaceOrientationMaskAll) && orientation == UIDeviceOrientationPortrait)) {
-                go = TRUE;
-            } else if (((mask == UIInterfaceOrientationMaskLandscape || mask == UIInterfaceOrientationMaskLandscapeLeft || mask == UIInterfaceOrientationMaskAllButUpsideDown || mask == UIInterfaceOrientationMaskAll) && orientation == UIDeviceOrientationLandscapeLeft)) {
-                go = TRUE;
-                angle = M_PI_2;
-                interfaceOrientation = UIInterfaceOrientationLandscapeRight;
-            } else if (((mask == UIInterfaceOrientationMaskPortraitUpsideDown ||  mask == UIInterfaceOrientationMaskAllButUpsideDown || mask == UIInterfaceOrientationMaskAll) && orientation == UIDeviceOrientationPortraitUpsideDown)) {
-                go = TRUE;
-                angle = M_PI;
-                interfaceOrientation = UIInterfaceOrientationPortraitUpsideDown;
-            } else if (((mask == UIInterfaceOrientationMaskLandscape || mask == UIInterfaceOrientationMaskLandscapeRight ||  mask == UIInterfaceOrientationMaskAllButUpsideDown || mask == UIInterfaceOrientationMaskAll) && orientation == UIDeviceOrientationLandscapeRight)) {
-                go = TRUE;
-                angle = -M_PI_2;
-                interfaceOrientation = UIInterfaceOrientationLandscapeLeft;
-            }
+        if (((mask == UIInterfaceOrientationMaskPortrait || mask == UIInterfaceOrientationMaskAllButUpsideDown || mask == UIInterfaceOrientationMaskAll) && orientation == UIDeviceOrientationPortrait)) {
+            go = TRUE;
+        } else if (((mask == UIInterfaceOrientationMaskLandscape || mask == UIInterfaceOrientationMaskLandscapeLeft || mask == UIInterfaceOrientationMaskAllButUpsideDown || mask == UIInterfaceOrientationMaskAll) && orientation == UIDeviceOrientationLandscapeLeft)) {
+            go = TRUE;
+            angle = M_PI_2;
+            interfaceOrientation = UIInterfaceOrientationLandscapeRight;
+        } else if (((mask == UIInterfaceOrientationMaskPortraitUpsideDown ||  mask == UIInterfaceOrientationMaskAllButUpsideDown || mask == UIInterfaceOrientationMaskAll) && orientation == UIDeviceOrientationPortraitUpsideDown)) {
+            go = TRUE;
+            angle = M_PI;
+            interfaceOrientation = UIInterfaceOrientationPortraitUpsideDown;
+        } else if (((mask == UIInterfaceOrientationMaskLandscape || mask == UIInterfaceOrientationMaskLandscapeRight ||  mask == UIInterfaceOrientationMaskAllButUpsideDown || mask == UIInterfaceOrientationMaskAll) && orientation == UIDeviceOrientationLandscapeRight)) {
+            go = TRUE;
+            angle = -M_PI_2;
+            interfaceOrientation = UIInterfaceOrientationLandscapeLeft;
+        }
         if (_disableVerticalMode) {
             angle = 0.0;
         }
@@ -311,13 +328,13 @@
                     _infiniteTabBar.frame = CGRectMake(0, 0, tempFrame.size.width, _infiniteTabBar.frame.size.height);
                     
                     //Rotate the child view controller if it supports the orientation
-//                    if (_selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAll || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAllButUpsideDown || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskPortrait ||
-//                        _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskPortraitUpsideDown) {
-//                        //Rotate View Bounds
-//                        _selectedViewController.view.transform = CGAffineTransformMakeRotation(angle);
-//                        _selectedViewController.view.bounds = CGRectMake(0, 0, tempFrame.size.width, tempFrame.size.height);
-//                    }
-
+                    //                    if (_selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAll || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskAllButUpsideDown || _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskPortrait ||
+                    //                        _selectedViewController.supportedInterfaceOrientations == UIInterfaceOrientationMaskPortraitUpsideDown) {
+                    //                        //Rotate View Bounds
+                    //                        _selectedViewController.view.transform = CGAffineTransformMakeRotation(angle);
+                    //                        _selectedViewController.view.bounds = CGRectMake(0, 0, tempFrame.size.width, tempFrame.size.height);
+                    //                    }
+                    
                     
                 }
                 else if (interfaceOrientation == UIInterfaceOrientationLandscapeLeft || interfaceOrientation == UIInterfaceOrientationLandscapeRight){
