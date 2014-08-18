@@ -28,8 +28,8 @@
     UIImageView *_backgroundImageView;
 }
 
-- (id)initWithTitle:(NSString *)title selectedIconMask:(UIImage *)selectedIconMask unselectedIconMask:(UIImage *)unselectedIconMask
-{
+- (id)initWithTitle:(NSString *)title selectedIconMask:(UIImage *)selectedIconMask unselectedIconMask:(UIImage *)unselectedIconMask titleFont:(UIFont*)font{
+    
     CGRect frame = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) ? CGRectMake(0, 10, 64, 50) : CGRectMake(0, 10, 768.0/11.0, 50);
     self = [super initWithFrame:frame];
     if (self) {
@@ -61,7 +61,7 @@
         _titleLabel.textColor = _unselectedTitleColor;
         _titleLabel.backgroundColor = [UIColor clearColor];
         _titleLabel.textAlignment = NSTextAlignmentCenter;
-        _titleFont = [UIFont boldSystemFontOfSize:7.0];
+        _titleFont = font;
         _titleLabel.font = _titleFont;
         [_containerView addSubview:_titleLabel];
         
@@ -69,6 +69,12 @@
         
     }
     return self;
+    
+    
+}
+- (id)initWithTitle:(NSString *)title selectedIconMask:(UIImage *)selectedIconMask unselectedIconMask:(UIImage *)unselectedIconMask
+{
+    return [self initWithTitle:title selectedIconMask:selectedIconMask unselectedIconMask:unselectedIconMask titleFont:[UIFont boldSystemFontOfSize:9.0]];
 }
 
 - (void)layoutSubviews
@@ -89,7 +95,7 @@
 
 - (id)copy
 {
-    M13InfiniteTabBarItem *item = [[M13InfiniteTabBarItem alloc] initWithTitle:_titleLabel.text selectedIconMask:_selectedIcon unselectedIconMask:_unselectedIcon];
+    M13InfiniteTabBarItem *item = [[M13InfiniteTabBarItem alloc] initWithTitle:_titleLabel.text selectedIconMask:_selectedIcon unselectedIconMask:_unselectedIcon titleFont:_titleFont];
     if (item) {
         [item setSelected:_selected];
         [item setRequiresUserAttention:_requiresAttention];
