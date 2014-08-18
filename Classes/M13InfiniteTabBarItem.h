@@ -27,6 +27,18 @@
  @return An instance of `M13InfiniteTabBarItem`. */
 - (id)initWithTitle:(NSString *)title selectedIconMask:(UIImage *)selectedIconMask unselectedIconMask:(UIImage *)unselectedIconMask;
 
+
+/** @name Initalization */
+/** Initalize the `M13InfiniteTabBarItem`.
+ @warning The icon should be 30x30px or 60x60px for @2x, specifing a larger image will incur noticeable performance costs.
+ @note The icon is treated as a mask. Anything that should be transparant make white. Anything solid make black. You can use gray for semi transparant.
+ @param title   The text that should be displayed, usually the title of the UIViewController.
+ @param selectedIconMask The icon to be displayed when the item is selected.
+ @param unselectedIconMask The icon to be displayed when the item is unselected.
+ @param override the default font size
+ @return An instance of `M13InfiniteTabBarItem`. */
+- (id)initWithTitle:(NSString *)title selectedIconMask:(UIImage *)selectedIconMask unselectedIconMask:(UIImage *)unselectedIconMask titleFont:(UIFont*)font;
+
 /** @name Appearance */
 /** The image that will show as the tab bar item's background.
  @note The Background Image moves with the tabs. The default is no background, the image would show instead of the tab bar's background. This image should be 64x50px on the retina iPhone, and 70x50px on the retina iPad, I trust that you can divide by two to get the non retina values. */
