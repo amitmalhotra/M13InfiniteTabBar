@@ -16,6 +16,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import "M13InfiniteTabBarItem.h"
 #import "M13InfiniteTabBarRequiresAttentionBackgroundView.h"
+#import "UIViewController+M13InfiniteTabBarExtension.h"
 
 
 @interface M13InfiniteTabBarController ()
@@ -141,7 +142,7 @@
             //Rotate the view controllers and tab bar items, so the center tab is the first one
             NSMutableArray *tempViewControllers = [NSMutableArray array];
             NSMutableArray *tempTabBarItems = [NSMutableArray array];
-            for (int i = _viewControllers.count - _selectedIndex; i < _viewControllers.count - _selectedIndex + _viewControllers.count; i++) {
+            for (int i = (int)_viewControllers.count - (int)_selectedIndex; i < _viewControllers.count - _selectedIndex + _viewControllers.count; i++) {
                 int j = i % _viewControllers.count;
                 [tempViewControllers addObject:_viewControllers[j]];
                 [tempTabBarItems addObject:_tabBarItems[j]];
@@ -191,6 +192,11 @@
         //Catch rotation changes for tabs
         [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleInterfaceChange:) name:UIDeviceOrientationDidChangeNotification object:nil];
+        
+        //Set the inifinite tab bar controller for each view controller.
+        for (UIViewController *vc in self.viewControllers) {
+            vc.infiniteTabBarController = self;
+        }
         
         _selectedViewController.view.frame = CGRectMake(0, 0, _contentView.frame.size.width, _contentView.frame.size.height);
         _selectedViewController.view.contentScaleFactor = [UIScreen mainScreen].scale;
@@ -665,7 +671,7 @@
     }
     //Create the search array
     NSMutableArray *searchArray = [NSMutableArray array];
-    for (int i = _selectedIndex + 1; i <= _viewControllers.count + _selectedIndex - 1; i++) {
+    for (int i = (int)_selectedIndex + 1; i <= (int)_viewControllers.count + (int)_selectedIndex - 1; i++) {
         [searchArray addObject:[NSNumber numberWithInt:(i % _viewControllers.count)]];
     }
     
