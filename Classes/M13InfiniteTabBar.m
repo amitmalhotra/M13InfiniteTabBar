@@ -163,9 +163,8 @@
         //Manually lay out the tabs, no scrolling occuring
         CGFloat width = self.frame.size.width / _items.count;
         CGFloat origin = 0;
-        CGFloat yOffset = (([[[UIDevice currentDevice] systemVersion] compare:@"8.0" options:NSNumericSearch] == NSOrderedAscending))?0:20;
         for (M13InfiniteTabBarItem *item in _visibleIcons) {
-            item.frame = CGRectMake(origin, yOffset, width, item.frame.size.height);
+            item.frame = CGRectMake(origin, 20.0, width, item.frame.size.height);
             origin += width;
             [_tabContainerView addSubview:item];
         }
