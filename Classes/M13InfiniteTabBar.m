@@ -91,7 +91,7 @@
             }
         }
         
-        [self rotateItemsToOrientation:[UIDevice currentDevice].orientation];
+        [self rotateItemsToOrientation:[UIDevice currentDevice].orientation disableVerticalMode:YES];
     }
     return self;
 }
@@ -163,9 +163,8 @@
         //Manually lay out the tabs, no scrolling occuring
         CGFloat width = self.frame.size.width / _items.count;
         CGFloat origin = 0;
-        CGFloat yOffset = (([[[UIDevice currentDevice] systemVersion] compare:@"8.0" options:NSNumericSearch] == NSOrderedAscending))?0:20;
         for (M13InfiniteTabBarItem *item in _visibleIcons) {
-            item.frame = CGRectMake(origin, yOffset, width, item.frame.size.height);
+            item.frame = CGRectMake(origin, 20.0, width, item.frame.size.height);
             origin += width;
             [_tabContainerView addSubview:item];
         }
@@ -238,7 +237,7 @@
 {
     //Get item of next index
     M13InfiniteTabBarItem *rightMostItem = [_visibleIcons lastObject];
-    int rightMostIndex = rightMostItem.tag;
+    int rightMostIndex = (int)rightMostItem.tag;
     int indexToInsert = rightMostIndex + 1;
     //Loop back if next index is past end of availableIcons
     if (indexToInsert == [_items count]) {
@@ -262,11 +261,11 @@
 {
     //Get item of next index
     M13InfiniteTabBarItem *leftMostItem = [_visibleIcons objectAtIndex:0];
-    int leftMostIndex = leftMostItem.tag;
+    int leftMostIndex = (int)leftMostItem.tag;
     int indexToInsert = leftMostIndex - 1;
     //Loop back if next index is past end of availableIcons
     if (indexToInsert == -1) {
-        indexToInsert = [_items count] - 1;
+        indexToInsert = (int)[_items count] - 1;
     }
     M13InfiniteTabBarItem *itemToInsert = [(M13InfiniteTabBarItem *)[_items objectAtIndex:indexToInsert] copy];
     itemToInsert.tag = indexToInsert;
