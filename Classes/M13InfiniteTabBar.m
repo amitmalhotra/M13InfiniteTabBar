@@ -91,7 +91,7 @@
             }
         }
         
-        [self rotateItemsToOrientation:[UIDevice currentDevice].orientation];
+        [self rotateItemsToOrientation:[UIDevice currentDevice].orientation disableVerticalMode:YES];
     }
     return self;
 }
