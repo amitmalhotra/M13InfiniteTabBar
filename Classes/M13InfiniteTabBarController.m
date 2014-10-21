@@ -255,11 +255,10 @@
 - (void)handleInterfaceChange:(NSNotification *)notification withAnimation:(BOOL)animate
 {
     //If notification is nil, we manually called for a redraw
-    if (_selectedViewController.shouldAutorotate || notification == nil) {
-        UIDeviceOrientation orientation = [UIDevice currentDevice].orientation;
-        
-        //If face down, face up, or unknow, make it same as the status bar orientation, otherwise no triangle will be drawn
-        if (!UIDeviceOrientationIsPortrait(orientation) && !UIDeviceOrientationIsLandscape(orientation)) {
+        if (_selectedViewController.shouldAutorotate || notification == nil) {
+            UIDeviceOrientation orientation = [UIDevice currentDevice].orientation;
+            
+            if ([[UIDevice currentDevice].systemVersion floatValue] >= 8.0f){
             UIInterfaceOrientation uiOrientation = [[UIApplication sharedApplication] statusBarOrientation];
             switch (uiOrientation) {
                 case UIInterfaceOrientationLandscapeLeft:
@@ -278,7 +277,31 @@
                     orientation=UIDeviceOrientationPortrait;
                     break;
             }
+        }else{
+            //If face down, face up, or unknow, make it same as the status bar orientation, otherwise no triangle will be drawn
+            if (!UIDeviceOrientationIsPortrait(orientation) && !UIDeviceOrientationIsLandscape(orientation)) {
+                UIInterfaceOrientation uiOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+                switch (uiOrientation) {
+                    case UIInterfaceOrientationLandscapeLeft:
+                        orientation=UIDeviceOrientationLandscapeLeft;
+                        break;
+                    case UIInterfaceOrientationLandscapeRight:
+                        orientation=UIDeviceOrientationLandscapeRight;
+                        break;
+                    case UIInterfaceOrientationPortrait:
+                        orientation=UIDeviceOrientationPortrait;
+                        break;
+                    case UIInterfaceOrientationPortraitUpsideDown:
+                        orientation=UIDeviceOrientationPortraitUpsideDown;
+                        break;
+                    default:
+                        orientation=UIDeviceOrientationPortrait;
+                        break;
+                }
+            }
+            
         }
+        
         
         //check to see if we should rotate, and set proper rotation values for animation
         UIInterfaceOrientationMask mask = _selectedViewController.supportedInterfaceOrientations;
@@ -317,6 +340,7 @@
             
             //Rotate Status Bar
             [[UIApplication sharedApplication] setStatusBarOrientation:interfaceOrientation];
+            
             //Rotate tab bar items
             [_infiniteTabBar rotateItemsToOrientation:orientation disableVerticalMode:_disableVerticalMode];
             
@@ -346,6 +370,10 @@
                 else if (interfaceOrientation == UIInterfaceOrientationLandscapeLeft || interfaceOrientation == UIInterfaceOrientationLandscapeRight){
                     tempFrame = CGRectMake(0, 0, totalSize.height, totalSize.width - 50.0);
                     _maskView.frame = CGRectMake(0, totalSize.width - 50.0 - triangleDepth, _maskView.frame.size.width, _maskView.frame.size.height);
+                    if ([[UIDevice currentDevice].systemVersion floatValue] >= 8.0f){
+                        tempFrame = CGRectMake(0, 0, totalSize.width, totalSize.height - 50.0);
+                        _maskView.frame = CGRectMake(0, totalSize.height - 50.0 - triangleDepth, _maskView.frame.size.width, _maskView.frame.size.height);
+                    }
                     
                     _contentView.frame = tempFrame;
                     _selectedViewController.view.frame = CGRectMake(0, 0, tempFrame.size.width, tempFrame.size.height);
