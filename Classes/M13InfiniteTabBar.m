@@ -69,7 +69,7 @@
         }
         
         //Set Previous Index
-        _previousSelectedIndex = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) ? 2 : 5;
+        _previousSelectedIndex = 0;
         //Determine if we have scrolling
         int numberOfItemsForScrolling = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) ? 6 : 15;
         if (_items.count < numberOfItemsForScrolling) {
