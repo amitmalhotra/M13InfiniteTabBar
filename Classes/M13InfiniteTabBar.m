@@ -333,9 +333,8 @@
 - (void)singleTapGestureCaptured:(UITapGestureRecognizer *)gesture
 {
     //Calculate the location in _tabBarContainer Coordinates
-    //CGPoint location = [gesture locationInView:nil];
-    CGPoint location = [gesture locationInView:self];
-    location.x += (self.contentOffset.x - _tabContainerView.frame.origin.x);
+    CGPoint location = [gesture locationInView:_tabContainerView];
+    //location.x += (self.contentOffset.x - _tabContainerView.frame.origin.x);
     
     M13InfiniteTabBarItem *item = (M13InfiniteTabBarItem *)[self itemAtLocation:location];
     if (item != nil) {
