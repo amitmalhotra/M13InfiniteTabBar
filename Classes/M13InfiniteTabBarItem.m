@@ -58,6 +58,12 @@
         //Create Text Label
         _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(2, 37, self.frame.size.width - 4.0, 10)];
         _titleLabel.text = title;
+        //Accessibility labels
+        NSString *label = [NSString stringWithFormat:NSLocalizedString(@"Dashboard %@", nil), title];
+        NSString *format = [NSString stringWithFormat:@"Dashboard %@", title];
+        [_titleLabel setIsAccessibilityElement:YES];
+        [_titleLabel setAccessibilityLabel:label];
+        [_titleLabel setAccessibilityIdentifier:format];
         _titleLabel.textColor = _unselectedTitleColor;
         _titleLabel.backgroundColor = [UIColor clearColor];
         _titleLabel.textAlignment = NSTextAlignmentCenter;
