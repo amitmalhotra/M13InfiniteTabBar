@@ -58,14 +58,14 @@
         //Create Text Label
         _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(2, 37, self.frame.size.width - 4.0, 10)];
         _titleLabel.text = title;
-        //accessibility labels:
+        //Accessibility labels
         NSString *label = [NSString stringWithFormat:NSLocalizedString(@"Dashboard %@", nil), title];
         NSString *format = [NSString stringWithFormat:@"Dashboard %@", title];
         [_titleLabel setIsAccessibilityElement:YES];
         [_titleLabel setAccessibilityLabel:label];
         [_titleLabel setAccessibilityIdentifier:format];
         
-        _titleLabel.textColor = _unselectedTitleColor;
+	_titleLabel.textColor = _unselectedTitleColor;
         _titleLabel.backgroundColor = [UIColor clearColor];
         _titleLabel.textAlignment = NSTextAlignmentCenter;
         _titleFont = font;
@@ -104,6 +104,17 @@
 {
     M13InfiniteTabBarItem *item = [[M13InfiniteTabBarItem alloc] initWithTitle:_titleLabel.text selectedIconMask:_selectedIcon unselectedIconMask:_unselectedIcon titleFont:_titleFont];
     if (item) {
+		item.backgroundImage = self.backgroundImage;
+		item.titleFont = self.titleFont;
+		item.selectedIconOverlayImage = self.selectedIconOverlayImage;
+		item.selectedIconTintColor = self.selectedIconTintColor;
+		item.unselectedIconOverlayImage = self.unselectedIconOverlayImage;
+		item.unselectedIconTintColor = self.unselectedIconTintColor;
+		item.attentionIconOverlayImage = self.attentionIconOverlayImage;
+		item.attentionIconTintColor = self.attentionIconTintColor;
+		item.selectedTitleColor = self.selectedTitleColor;
+		item.unselectedTitleColor = self.unselectedTitleColor;
+		item.attentionTitleColor = self.attentionTitleColor;
         [item setSelected:_selected];
         [item setRequiresUserAttention:_requiresAttention];
         UIView *itemContainerView = [item.subviews objectAtIndex:0];
@@ -116,17 +127,17 @@
 {
     _selected = selected;
     
-    [_iconView setImage:[self createColoredIconForCurrnetState]];
+    [_iconView setImage:[self createColoredIconForCurrentState]];
 }
 
 - (void)setRequiresUserAttention:(BOOL)requiresAttention
 {
     _requiresAttention = requiresAttention;
     
-    [_iconView setImage:[self createColoredIconForCurrnetState]];
+    [_iconView setImage:[self createColoredIconForCurrentState]];
 }
 
-- (UIImage *)createColoredIconForCurrnetState
+- (UIImage *)createColoredIconForCurrentState
 {
     //Set colors
     if (_selected) {

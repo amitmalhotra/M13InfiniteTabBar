@@ -69,7 +69,7 @@
         }
         
         //Set Previous Index
-        _previousSelectedIndex = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) ? 2 : 5;
+        _previousSelectedIndex = 0;
         //Determine if we have scrolling
         int numberOfItemsForScrolling = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) ? 6 : 15;
         if (_items.count < numberOfItemsForScrolling) {
@@ -333,8 +333,8 @@
 - (void)singleTapGestureCaptured:(UITapGestureRecognizer *)gesture
 {
     //Calculate the location in _tabBarContainer Coordinates
-    CGPoint location = [gesture locationInView:nil];
-    location.x += (self.contentOffset.x - _tabContainerView.frame.origin.x);
+    CGPoint location = [gesture locationInView:_tabContainerView];
+    //location.x += (self.contentOffset.x - _tabContainerView.frame.origin.x);
     
     M13InfiniteTabBarItem *item = (M13InfiniteTabBarItem *)[self itemAtLocation:location];
     if (item != nil) {
