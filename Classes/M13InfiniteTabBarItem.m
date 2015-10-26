@@ -28,6 +28,11 @@
     UIImageView *_backgroundImageView;
 }
 
+- (id)initWithTitle:(NSString *)title selectedIconMask:(UIImage *)selectedIconMask unselectedIconMask:(UIImage *)unselectedIconMask titleFont:(UIFont*)font
+{
+    return [self initWithTitle:title selectedIconMask:selectedIconMask unselectedIconMask:unselectedIconMask titleFont:font tabColor:[UIColor colorWithRed:0.02 green:0.47 blue:1 alpha:1]];
+}
+
 - (id)initWithTitle:(NSString *)title selectedIconMask:(UIImage *)selectedIconMask unselectedIconMask:(UIImage *)unselectedIconMask titleFont:(UIFont*)font tabColor:(UIColor *)color
 {
     CGRect frame = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) ? CGRectMake(0, 10, 64, 50) : CGRectMake(0, 10, 768.0/11.0, 50);
@@ -79,11 +84,6 @@
     
     
 }
-
-//- (id)initWithTitle:(NSString *)title selectedIconMask:(UIImage *)selectedIconMask unselectedIconMask:(UIImage *)unselectedIconMask
-//{
-//    return [self initWithTitle:title selectedIconMask:selectedIconMask unselectedIconMask:unselectedIconMask titleFont:[UIFont boldSystemFontOfSize:9.0]];
-//}
 
 - (void)layoutSubviews
 {
