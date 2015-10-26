@@ -55,6 +55,8 @@
  @return An initalized `M13InfiniteTabBar` instance. */
 - (id)initWithInfiniteTabBarItems:(NSArray *)items;
 
+- (void)updateTabsWithColor:(UIColor *)color;
+
 /** @name Delegate */
 /** Tab bar's delegate. */
 @property (nonatomic, retain) id<M13InfiniteTabBarDelegate> tabBarDelegate;

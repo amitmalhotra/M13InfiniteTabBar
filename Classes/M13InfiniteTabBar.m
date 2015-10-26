@@ -96,6 +96,27 @@
     return self;
 }
 
+- (void)updateTabsWithColor:(UIColor *)color
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+
+        [[M13InfiniteTabBarItem appearance] setSelectedIconTintColor:color];
+        [[M13InfiniteTabBarItem appearance] setSelectedTitleColor:color];
+
+        for (M13InfiniteTabBarItem *item in _items) {
+
+            [item updateTabWithColor:color];
+        }
+
+        [_selectedItem setSelectedIconTintColor:color];
+        [_selectedItem setSelectedTitleColor:color];
+
+        [self layoutIfNeeded];
+
+        [self selectItem:_selectedItem];
+    });
+}
+
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
     //Allow the scroll view to work simintaniously with the tap gesture and pull view gesture

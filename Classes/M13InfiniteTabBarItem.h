@@ -25,7 +25,7 @@
  @param selectedIconMask The icon to be displayed when the item is selected.
  @param unselectedIconMask The icon to be displayed when the item is unselected.
  @return An instance of `M13InfiniteTabBarItem`. */
-- (id)initWithTitle:(NSString *)title selectedIconMask:(UIImage *)selectedIconMask unselectedIconMask:(UIImage *)unselectedIconMask;
+//- (id)initWithTitle:(NSString *)title selectedIconMask:(UIImage *)selectedIconMask unselectedIconMask:(UIImage *)unselectedIconMask;
 
 
 /** @name Initalization */
@@ -37,7 +37,9 @@
  @param unselectedIconMask The icon to be displayed when the item is unselected.
  @param override the default font size
  @return An instance of `M13InfiniteTabBarItem`. */
-- (id)initWithTitle:(NSString *)title selectedIconMask:(UIImage *)selectedIconMask unselectedIconMask:(UIImage *)unselectedIconMask titleFont:(UIFont*)font;
+- (id)initWithTitle:(NSString *)title selectedIconMask:(UIImage *)selectedIconMask unselectedIconMask:(UIImage *)unselectedIconMask titleFont:(UIFont*)font tabColor:(UIColor *)color;
+
+- (void)updateTabWithColor:(UIColor *)color;
 
 /** @name Appearance */
 /** The image that will show as the tab bar item's background.

@@ -28,8 +28,8 @@
     UIImageView *_backgroundImageView;
 }
 
-- (id)initWithTitle:(NSString *)title selectedIconMask:(UIImage *)selectedIconMask unselectedIconMask:(UIImage *)unselectedIconMask titleFont:(UIFont*)font{
-    
+- (id)initWithTitle:(NSString *)title selectedIconMask:(UIImage *)selectedIconMask unselectedIconMask:(UIImage *)unselectedIconMask titleFont:(UIFont*)font tabColor:(UIColor *)color
+{
     CGRect frame = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) ? CGRectMake(0, 10, 64, 50) : CGRectMake(0, 10, 768.0/11.0, 50);
     self = [super initWithFrame:frame];
     if (self) {
@@ -43,10 +43,10 @@
         _icon = _unselectedIcon;
         self.backgroundColor = [UIColor clearColor];
         _unselectedTitleColor = [UIColor colorWithRed:0.56 green:0.56 blue:0.56 alpha:1];
-        _selectedTitleColor = [UIColor colorWithRed:0.02 green:0.47 blue:1 alpha:1];
+        _selectedTitleColor = color;
         _attentionTitleColor = [UIColor colorWithRed:0.98 green:0.24 blue:0.15 alpha:1];
         _unselectedIconTintColor = [UIColor colorWithRed:0.56 green:0.56 blue:0.56 alpha:1];
-        _selectedIconTintColor = [UIColor colorWithRed:0.02 green:0.47 blue:1 alpha:1];
+        _selectedIconTintColor = color;
         _attentionIconTintColor = [UIColor colorWithRed:0.98 green:0.24 blue:0.15 alpha:1];
         
         //Create icon's view
@@ -79,10 +79,11 @@
     
     
 }
-- (id)initWithTitle:(NSString *)title selectedIconMask:(UIImage *)selectedIconMask unselectedIconMask:(UIImage *)unselectedIconMask
-{
-    return [self initWithTitle:title selectedIconMask:selectedIconMask unselectedIconMask:unselectedIconMask titleFont:[UIFont boldSystemFontOfSize:9.0]];
-}
+
+//- (id)initWithTitle:(NSString *)title selectedIconMask:(UIImage *)selectedIconMask unselectedIconMask:(UIImage *)unselectedIconMask
+//{
+//    return [self initWithTitle:title selectedIconMask:selectedIconMask unselectedIconMask:unselectedIconMask titleFont:[UIFont boldSystemFontOfSize:9.0]];
+//}
 
 - (void)layoutSubviews
 {
@@ -102,7 +103,7 @@
 
 - (id)copy
 {
-    M13InfiniteTabBarItem *item = [[M13InfiniteTabBarItem alloc] initWithTitle:_titleLabel.text selectedIconMask:_selectedIcon unselectedIconMask:_unselectedIcon titleFont:_titleFont];
+    M13InfiniteTabBarItem *item = [[M13InfiniteTabBarItem alloc] initWithTitle:_titleLabel.text selectedIconMask:_selectedIcon unselectedIconMask:_unselectedIcon titleFont:_titleFont tabColor:_selectedIconTintColor];
     if (item) {
 		item.backgroundImage = self.backgroundImage;
 		item.titleFont = self.titleFont;
@@ -135,6 +136,12 @@
     _requiresAttention = requiresAttention;
     
     [_iconView setImage:[self createColoredIconForCurrentState]];
+}
+
+- (void)updateTabWithColor:(UIColor *)color
+{
+    _selectedTitleColor = color;
+    _selectedIconTintColor = color;
 }
 
 - (UIImage *)createColoredIconForCurrentState
