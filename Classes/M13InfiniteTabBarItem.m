@@ -37,7 +37,9 @@
 {
     CGRect frame = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) ? CGRectMake(0, 10, 64, 50) : CGRectMake(0, 10, 768.0/11.0, 50);
     self = [super initWithFrame:frame];
+    
     if (self) {
+        
         //Container view to handle rotations
         _containerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
         _containerView.backgroundColor = [UIColor clearColor];
@@ -63,26 +65,31 @@
         //Create Text Label
         _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(2, 37, self.frame.size.width - 4.0, 10)];
         _titleLabel.text = title;
+        
         //Accessibility labels
         NSString *label = [NSString stringWithFormat:NSLocalizedString(@"Dashboard %@", nil), title];
         NSString *format = [NSString stringWithFormat:@"Dashboard %@", title];
+        
         [_titleLabel setIsAccessibilityElement:YES];
         [_titleLabel setAccessibilityLabel:label];
         [_titleLabel setAccessibilityIdentifier:format];
         
-	_titleLabel.textColor = _unselectedTitleColor;
+        _titleLabel.textColor = _unselectedTitleColor;
         _titleLabel.backgroundColor = [UIColor clearColor];
         _titleLabel.textAlignment = NSTextAlignmentCenter;
         _titleFont = font;
         _titleLabel.font = _titleFont;
+        
         [_containerView addSubview:_titleLabel];
         
-        [self addSubview:_containerView];
+        [_containerView setIsAccessibilityElement:YES];
+        [_containerView setAccessibilityLabel:label];
+        [_containerView setAccessibilityIdentifier:format];
         
+        [self addSubview:_containerView];
     }
+    
     return self;
-    
-    
 }
 
 - (void)layoutSubviews
